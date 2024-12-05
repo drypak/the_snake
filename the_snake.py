@@ -110,7 +110,10 @@ class Apple(GameObject):
     def __init__(self, snake_positions=None):
         """Инициализация яблока."""
         super().__init__(APPLE_COLOR)
-        self.snake_positions = snake_positions if snake_positions is not None else []
+        if snake_positions is None:
+            self.snake_positions = snake_positions
+        else:
+            self.snake_positions = []    
 
     def randomize_position(self, snake_positions):
         """Случайная позиция яблока."""

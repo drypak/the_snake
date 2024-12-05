@@ -110,12 +110,9 @@ class Apple(GameObject):
     def __init__(self, snake_positions=None):
         """Инициализация яблока."""
         super().__init__(APPLE_COLOR)
-        if snake_positions is None:
-            snake_positions = []
-        self.snake_positions = snake_positions
-        self.randomize_position()
+        self.snake_positions = snake_positions if snake_positions is not None else []
 
-    def randomize_position(self):
+    def randomize_position(self, snake_positions):
         """Случайная позиция яблока."""
         while True:
             new_position = (
@@ -157,11 +154,11 @@ def main():
         clock.tick(SPEED)
 
         handle_keys(snake)
-
         snake.move()
+
         if snake.get_head_position() == apple.position:
             snake.grow()
-            apple.randomize_position()
+            apple.randomize_position(snake.positions)
 
         screen.fill(BOARD_BACKGROUND_COLOR)
         snake.draw()

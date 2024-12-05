@@ -115,6 +115,7 @@ class Apple(GameObject):
         else:
             self.snake_positions = []    
 
+
     def randomize_position(self, snake_positions):
         """Случайная позиция яблока."""
         while True:

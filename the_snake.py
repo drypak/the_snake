@@ -29,6 +29,15 @@ DEFAULT_BODY_COLOR = (255, 255, 255)
 # Скорость игры
 SPEED = 20
 
+# Начальная длина змейки
+INITIAL_SNAKE_LENGTH = 1
+
+# Толщина границы головы змейки
+HEAD_BORDER_WIDTH = 2
+
+# Ширина границы
+BORDER_WIDTH = 1
+
 # Начальная позиция по умолчанию
 DEFAULT_POSITION = (0, 0)
 
@@ -69,8 +78,7 @@ class Snake(GameObject):
         """Сбрасываем змейку в начальное положение."""
         self.positions = [START_POSITION]
         self.direction = RIGHT
-        self.last_direction = RIGHT
-        self.length = 1
+        self.length = INITIAL_SNAKE_LENGTH
         self.last = None
 
     def draw(self):
@@ -80,14 +88,14 @@ class Snake(GameObject):
         if self.last:
             rect = pg.Rect(self.last, (GRID_SIZE, GRID_SIZE))
             pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, rect)
-            pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, rect, 1)
+            pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, rect, BORDER_WIDTH)
 
         for segment in self.positions[1:]:
             self.draw_cell(segment)
 
         head_rect = pg.Rect(self.get_head_position(), (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, SNAKE_COLOR, head_rect)
-        pg.draw.rect(screen, BORDER_COLOR, head_rect, 2)
+        pg.draw.rect(screen, BORDER_COLOR, head_rect, HEAD_BORDER_WIDTH)
 
     def get_head_position(self):
         """Возвращаем координаты головы змейки."""
@@ -95,7 +103,6 @@ class Snake(GameObject):
 
     def update_direction(self, new_direction):
         """Обновление направления змейки."""
-        self.last_direction = self.direction
         self.direction = new_direction
 
     def move(self):
@@ -125,17 +132,14 @@ class Apple(GameObject):
         super().__init__(APPLE_COLOR)
         self.snake_positions = []
 
-    def randomize_position(self, snake_positions, last_removed=None):
+    def randomize_position(self, snake_positions):
         """Случайная позиция яблока."""
         while True:
             new_position = (
                 randint(0, GRID_WIDTH - 1) * GRID_SIZE,
                 randint(0, GRID_HEIGHT - 1) * GRID_SIZE,
             )
-            position_is_free = new_position not in snake_positions
-            not_last_removed = new_position != last_removed
-
-            if position_is_free and not_last_removed:
+            if new_position not in snake_positions:
                 self.position = new_position
                 break
 
@@ -173,12 +177,14 @@ def main():
         snake.move()
 
         if snake.get_head_position() in snake.positions[1:]:
+            screen.fill(BOARD_BACKGROUND_COLOR)
             snake.reset()
+            apple.randomize_position(snake.positions)
 
         if snake.get_head_position() == apple.position:
             snake.grow()
-            apple.randomize_position(snake.positions, snake.last)
-        screen.fill(BOARD_BACKGROUND_COLOR)
+            apple.randomize_position(snake.positions)
+
         snake.draw()
         apple.draw()
         pg.display.update()

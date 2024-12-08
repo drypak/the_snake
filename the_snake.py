@@ -59,11 +59,10 @@ class GameObject:
         """Рисуем одну клетку."""
         rect = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, self.body_color, rect)
-        pg.draw.rect(screen, BORDER_COLOR, rect, 1)
+        pg.draw.rect(screen, BORDER_COLOR, rect, BORDER_WIDTH)
 
     def draw(self):
         """Заготовка для отрисовки игрового объекта."""
-        pass
 
 
 class Snake(GameObject):
@@ -90,12 +89,8 @@ class Snake(GameObject):
             pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, rect)
             pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, rect, BORDER_WIDTH)
 
-        for segment in self.positions[1:]:
+        for segment in self.positions:
             self.draw_cell(segment)
-
-        head_rect = pg.Rect(self.get_head_position(), (GRID_SIZE, GRID_SIZE))
-        pg.draw.rect(screen, SNAKE_COLOR, head_rect)
-        pg.draw.rect(screen, BORDER_COLOR, head_rect, HEAD_BORDER_WIDTH)
 
     def get_head_position(self):
         """Возвращаем координаты головы змейки."""
@@ -130,17 +125,15 @@ class Apple(GameObject):
     def __init__(self):
         """Инициализация яблока."""
         super().__init__(APPLE_COLOR)
-        self.snake_positions = []
 
-    def randomize_position(self, snake_positions):
+    def randomize_position(self, take_positions):
         """Случайная позиция яблока."""
         while True:
-            new_position = (
+            self.position = (
                 randint(0, GRID_WIDTH - 1) * GRID_SIZE,
                 randint(0, GRID_HEIGHT - 1) * GRID_SIZE,
             )
-            if new_position not in snake_positions:
-                self.position = new_position
+            if self.position not in take_positions:
                 break
 
     def draw(self):
@@ -183,7 +176,8 @@ def main():
 
         if snake.get_head_position() == apple.position:
             snake.grow()
-            apple.randomize_position(snake.positions)
+            take_positions = snake.positions
+            apple.randomize_position(take_positions)
 
         snake.draw()
         apple.draw()

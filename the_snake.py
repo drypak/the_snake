@@ -81,16 +81,16 @@ class Snake(GameObject):
         self.last = None
 
     def draw(self):
-        """Отрисовка головы, хвоста змейки.
-        и очистка последней удаленной клетки.
-        """
+        """Обновляем изменения змейки."""
         if self.last:
             rect = pg.Rect(self.last, (GRID_SIZE, GRID_SIZE))
-            pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, rect)
+            pg.draw.rect(screen, BOARD_BACKGROUND_COLOR,
+                         rect)  # Очистка хвоста
             pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, rect, BORDER_WIDTH)
 
-        for segment in self.positions:
-            self.draw_cell(segment)
+        # Отрисовка нового сегмента(голова)
+        head = self.get_head_position()
+        self.draw_cell(head)
 
     def get_head_position(self):
         """Возвращаем координаты головы змейки."""
@@ -125,16 +125,19 @@ class Apple(GameObject):
     def __init__(self):
         """Инициализация яблока."""
         super().__init__(APPLE_COLOR)
+        self.randomize_position([DEFAULT_POSITION])
 
     def randomize_position(self, take_positions):
         """Случайная позиция яблока."""
-        while True:
+        self.position = (
+            randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+            randint(0, GRID_HEIGHT - 1) * GRID_SIZE,
+        )
+        while self.position in take_positions:
             self.position = (
                 randint(0, GRID_WIDTH - 1) * GRID_SIZE,
                 randint(0, GRID_HEIGHT - 1) * GRID_SIZE,
             )
-            if self.position not in take_positions:
-                break
 
     def draw(self):
         """Рисуем яблоко."""
